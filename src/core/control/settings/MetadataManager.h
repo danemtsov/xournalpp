@@ -62,7 +62,7 @@ private:
     /**
      * Parse a single metadata file
      */
-    static MetadataEntry loadMetadataFile(fs::path const& path, fs::path const& file);
+    static MetadataEntry loadMetadataFile(fs::path const& path);
 
     /**
      * Store metadata to file

@@ -6,6 +6,7 @@
 #include <memory>     // for allocator_traits<>::value_type
 #include <sstream>    // for istringstream
 #include <string>     // for char_traits, string, getline, operator!=
+#include <tuple>
 
 #include <glib.h>  // for g_get_real_time, g_warning, gint64
 
@@ -27,13 +28,15 @@ MetadataManager::~MetadataManager() { documentChanged(); }
 void MetadataManager::deleteMetadataFile(fs::path const& path) {
     // be careful, delete the Metadata file, NOT the Document!
     if (path.extension() != ".metadata") {
-        g_warning("Try to delete non-metadata file: %s", path.string().c_str());
+        g_warning("Try to delete non-metadata file: %s", path.u8string().c_str());
         return;
     }
 
     try {
         fs::remove(path);
-    } catch (const fs::filesystem_error&) { g_warning("Could not delete metadata file %s", path.string().c_str()); }
+    } catch (const fs::filesystem_error&) {
+        g_warning("Could not delete metadata file %s", path.u8string().c_str());
+    }
 }
 
 /**
@@ -64,9 +67,7 @@ auto MetadataManager::loadList() -> vector<MetadataEntry> {
     vector<MetadataEntry> data;
     try {
         for (auto const& f: fs::directory_iterator(folder)) {
-            auto path = folder / f;
-
-            MetadataEntry entry = loadMetadataFile(path, f.path());
+            MetadataEntry entry = loadMetadataFile(f.path());
 
             if (entry.valid) {
                 data.push_back(entry);
@@ -85,45 +86,51 @@ auto MetadataManager::loadList() -> vector<MetadataEntry> {
 /**
  * Parse a single metadata file
  */
-auto MetadataManager::loadMetadataFile(fs::path const& path, fs::path const& file) -> MetadataEntry {
+auto MetadataManager::loadMetadataFile(fs::path const& path) -> MetadataEntry {
     MetadataEntry entry;
     entry.metadataFile = path;
 
-    string line;
-    ifstream infile(path);
+    using MetadataErrorTuple = std::tuple<string>;
+    try {
+        string line;
+        ifstream infile(path);
 
-    auto time = file.stem().string();
-    entry.time = strtoll(time.c_str(), nullptr, 10);
+        auto time = path.stem().u8string();
+        entry.time = strtoll(time.c_str(), nullptr, 10);
 
-    if (!getline(infile, line) || line != "XOJ-METADATA/1.0") {
+        if (!getline(infile, line) || line != "XOJ-METADATA/1.0") {
+            throw MetadataErrorTuple{"invalid header line"};
+        }
+
+        if (!getline(infile, line)) {
+            throw MetadataErrorTuple{"invalid 2nd line"};
+        }
+        istringstream iss(line);
+        iss >> quoted(line);
+        try {
+            entry.path = fs::u8path(line);
+        } catch (const std::exception& e) {
+            throw MetadataErrorTuple{string("Error decoding file path: ") += e.what()};
+        }
+
+        if (!getline(infile, line) || line.length() < 6 || line.substr(0, 5) != "page=") {
+            throw MetadataErrorTuple{"invalid 3rd line"};
+        }
+        entry.page = strtoll(line.substr(5).c_str(), nullptr, 10);
+
+        if (!getline(infile, line) || line.length() < 6 || line.substr(0, 5) != "zoom=") {
+            throw MetadataErrorTuple{"invalid 4th line"};
+        }
+        entry.zoom = strtod(line.substr(5).c_str(), nullptr);
+
+        entry.valid = true;
+
+    } catch (const MetadataErrorTuple& e) {
+        const auto& [invalidReason] = e;
+        g_warning("Invalid metadata file: %s - deleting %s", invalidReason.c_str(), path.u8string().c_str());
         deleteMetadataFile(path);
-        // Not valid
-        return entry;
     }
 
-    if (!getline(infile, line)) {
-        deleteMetadataFile(path);
-        // Not valid
-        return entry;
-    }
-    istringstream iss(line);
-    iss >> entry.path;
-
-    if (!getline(infile, line) || line.length() < 6 || line.substr(0, 5) != "page=") {
-        deleteMetadataFile(path);
-        // Not valid
-        return entry;
-    }
-    entry.page = strtoll(line.substr(5).c_str(), nullptr, 10);
-
-    if (!getline(infile, line) || line.length() < 6 || line.substr(0, 5) != "zoom=") {
-        deleteMetadataFile(path);
-        // Not valid
-        return entry;
-    }
-    entry.zoom = strtod(line.substr(5).c_str(), nullptr);
-
-    entry.valid = true;
     return entry;
 }
 
@@ -167,8 +174,10 @@ void MetadataManager::storeMetadata(MetadataEntry* m) {
     path += ".metadata";
 
     ofstream out(path);
+    // TODO (danemtsov) revisit when locale issues are resolved (xournalpp/#3611)
+    out.imbue(locale::classic());
     out << "XOJ-METADATA/1.0\n";
-    out << m->path << "\n";
+    out << quoted(m->path.u8string()) << "\n";
     out << "page=" << m->page << "\n";
     out << "zoom=" << m->zoom << "\n";
     out.close();
