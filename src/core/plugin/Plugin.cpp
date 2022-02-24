@@ -209,7 +209,7 @@ void Plugin::loadScript() {
     auto luafile = path / mainfile;
     if (luaL_loadfile(lua.get(), luafile.string().c_str())) {
         // Error out if file can't be read
-        g_warning("Could not run plugin Lua file: \"%s\"", luafile.string().c_str());
+        g_warning("Could not run plugin Lua file: \"%s\"", luafile.u8string().c_str());
         this->valid = false;
         return;
     }
@@ -229,7 +229,7 @@ void Plugin::loadScript() {
         button.insert(std::pair<int, std::string>(0, _("OK")));
         XojMsgBox::showPluginMessage(name, errMsg, button, true);
 
-        g_warning("Could not run plugin Lua file: \"%s\", error: \"%s\"", luafile.string().c_str(), errMsg);
+        g_warning("Could not run plugin Lua file: \"%s\", error: \"%s\"", luafile.u8string().c_str(), errMsg);
         this->valid = false;
         return;
     }

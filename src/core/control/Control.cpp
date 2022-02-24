@@ -227,7 +227,7 @@ void Control::renameLastAutosaveFile() {
     auto const& filename = this->lastAutosaveFilename;
     auto renamed = Util::getAutosaveFilepath();
     Util::clearExtensions(renamed);
-    if (!filename.empty() && filename.string().front() != '.') {
+    if (!filename.empty() && filename.native().front() != '.') {
         // This file must be a fresh, unsaved document. Since this file is
         // already in the autosave directory, we need to change the renamed filename.
         renamed += ".old.autosave.xopp";
@@ -236,8 +236,9 @@ void Control::renameLastAutosaveFile() {
         renamed += filename.filename();
     }
 
-    g_message("%s", FS(_F("Autosave renamed from {1} to {2}") % this->lastAutosaveFilename.string() % renamed.string())
-                            .c_str());
+    g_message("%s",
+              FS(_F("Autosave renamed from {1} to {2}") % this->lastAutosaveFilename.u8string() % renamed.u8string())
+                      .c_str());
 
     if (!fs::exists(filename)) {
         this->save(false);
@@ -2258,7 +2259,7 @@ auto Control::openFile(fs::path filepath, int scrollToPage, bool forceOpen) -> b
         bool attachPdf = false;
         XojOpenDlg dlg(getGtkWindow(), this->settings);
         filepath = dlg.showOpenDialog(false, attachPdf);
-        g_message("%s", (_F("file: {1}") % filepath.string()).c_str());
+        g_message("%s", (_F("file: {1}") % filepath.u8string()).c_str());
     }
 
     if (filepath.empty() || (!forceOpen && !shouldFileOpen(filepath))) {
@@ -2288,20 +2289,20 @@ auto Control::openFile(fs::path filepath, int scrollToPage, bool forceOpen) -> b
         std::string parentFolderPath;
         std::string filename;
 #if defined(WIN32)
-        parentFolderPath = missingFilePath.parent_path().string();
-        filename = missingFilePath.filename().string();
+        parentFolderPath = missingFilePath.parent_path().u8string();
+        filename = missingFilePath.filename().u8string();
 #else
         // since POSIX systems detect the whole Windows path as a filename, this checks whether missingFilePath
         // contains a Windows path
         std::regex regex(R"([A-Z]:\\(?:.*\\)*(.*))");
         std::cmatch matchInfo;
 
-        if (std::regex_match(missingFilePath.filename().string().c_str(), matchInfo, regex) && matchInfo[1].matched) {
-            parentFolderPath = missingFilePath.filename().string();
+        if (std::regex_match(missingFilePath.filename().u8string().c_str(), matchInfo, regex) && matchInfo[1].matched) {
+            parentFolderPath = missingFilePath.filename().u8string();
             filename = matchInfo[1].str();
         } else {
-            parentFolderPath = missingFilePath.parent_path().string();
-            filename = missingFilePath.filename().string();
+            parentFolderPath = missingFilePath.parent_path().u8string();
+            filename = missingFilePath.filename().u8string();
         }
 #endif
         std::string msg;
@@ -2319,7 +2320,7 @@ auto Control::openFile(fs::path filepath, int scrollToPage, bool forceOpen) -> b
         bool proposePdfFile = !loadHandler.isAttachedPdfMissing() && !filename.empty() &&
                               fs::exists(proposedPdfFilepath) && !fs::is_directory(proposedPdfFilepath);
         if (proposePdfFile) {
-            msg += FS(_F("\nProposed replacement file: \"{1}\"") % proposedPdfFilepath.string());
+            msg += FS(_F("\nProposed replacement file: \"{1}\"") % proposedPdfFilepath.u8string());
         }
         GtkWidget* dialog = gtk_message_dialog_new(getGtkWindow(), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION,
                                                    GTK_BUTTONS_NONE, "%s", msg.c_str());
