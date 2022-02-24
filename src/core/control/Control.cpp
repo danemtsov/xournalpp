@@ -2284,7 +2284,7 @@ auto Control::openFile(fs::path filepath, int scrollToPage, bool forceOpen) -> b
     if ((loadedDocument != nullptr && loadHandler.isAttachedPdfMissing()) ||
         !loadHandler.getMissingPdfFilename().empty()) {
         // give the user a second chance to select a new PDF filepath, or to discard the PDF
-        const fs::path missingFilePath = fs::path(loadHandler.getMissingPdfFilename());
+        const fs::path missingFilePath = fs::u8path(loadHandler.getMissingPdfFilename());
 
         std::string parentFolderPath;
         std::string filename;
