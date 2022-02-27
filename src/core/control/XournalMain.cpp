@@ -615,7 +615,7 @@ auto XournalMain::run(int argc, char** argv) -> int {
     std::array options = {GOptionEntry{"page", 'n', 0, G_OPTION_ARG_INT, &app_data.openAtPageNumber,
                                        _("Jump to Page (first Page: 1)"), "N"},
                           GOptionEntry{G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &app_data.optFilename,
-                                       "<input>", nullptr},
+                                       nullptr, "[FILE]"},
                           GOptionEntry{"version", 0, 0, G_OPTION_ARG_NONE, &app_data.showVersion,
                                        _("Get version of xournalpp"), nullptr},
                           GOptionEntry{nullptr}};  // Must be terminated by a nullptr. See gtk doc
