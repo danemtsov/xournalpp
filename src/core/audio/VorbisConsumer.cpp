@@ -32,7 +32,7 @@ auto VorbisConsumer::start(fs::path const& file) -> bool {
     sfInfo.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
     sfInfo.samplerate = static_cast<int>(this->settings.getAudioSampleRate());
 
-    auto sfFile = audio::make_snd_file(file.native(), SFM_WRITE, &sfInfo);
+    auto sfFile = audio::make_snd_file(file, SFM_WRITE, &sfInfo);
     if (!sfFile) {
         g_warning("VorbisConsumer: output file \"%s\" could not be opened\ncaused by:%s", file.u8string().c_str(),
                   sf_strerror(sfFile.get()));

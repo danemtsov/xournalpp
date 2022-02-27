@@ -55,7 +55,7 @@ inline SNDFILE* sf_open_pp(std::wstring const& path, int mode, SF_INFO* info) {
 
 // naming similar to std::make_unique
 inline auto make_snd_file(fs::path const& file, int mode, SF_INFO* info) {
-    return SNDFileGuard{sf_open_pp(file, mode, info)};
+    return SNDFileGuard{sf_open_pp(file.native(), mode, info)};
 }
 
 }  // namespace xoj::audio
