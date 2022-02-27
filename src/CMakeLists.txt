@@ -9,13 +9,33 @@ cmake_policy(VERSION 3.13)
 ##############################
 
 add_library(defaults INTERFACE)
-target_compile_options(defaults INTERFACE -Wall -Wreturn-type -Wuninitialized -Wunused-value -Wunused-variable -Wconversion)
+target_compile_options(defaults INTERFACE -ffile-prefix-map=${CMAKE_SOURCE_DIR}=/xournalpp -Wall -Wreturn-type -Wuninitialized -Wunused-value -Wunused-variable -Wconversion)
 target_include_directories(defaults INTERFACE ${PROJECT_BINARY_DIR}/src)
 add_library(xoj::defaults ALIAS defaults)
 if (MSVC)
   target_compile_definitions(defaults INTERFACE NOMINMAX WIN32_LEAN_AND_MEAN)
 endif ()
 if(WIN32)
+    function(get_msys2_root msys2_root_var)
+        execute_process(COMMAND cygpath -w /
+                RESULT_VARIABLE cygpath_RESULT
+                OUTPUT_VARIABLE cygpath_OUTPUT
+                ERROR_VARIABLE cygpath_ERROR)
+        if(cygpath_RESULT EQUAL 0)
+            string(REPLACE "\\" "/" MSYS2_ROOT ${cygpath_OUTPUT})
+            string(REPLACE "/\n" "" MSYS2_ROOT ${MSYS2_ROOT})
+            set(${msys2_root_var} ${MSYS2_ROOT} PARENT_SCOPE)
+        else()
+            message(FATAL_ERROR "Failed to get MSYS2 root directory: " ${cygpath_ERROR})
+        endif()
+    endfunction()
+    get_msys2_root(MSYS2_ROOT)
+    if(MSVC)
+        # MSVC doesn't seem to support file remapping yet:
+        # https://developercommunity.visualstudio.com/t/map-file-to-a-relative-path/1393881
+    else()
+        target_compile_options(defaults INTERFACE -ffile-prefix-map=${MSYS2_ROOT}=/msys64)
+    endif()
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND DEBUG_CLANG_USE_PDB)
         target_compile_options(defaults INTERFACE -g -gcodeview)
         target_link_options(defaults INTERFACE -Wl,-pdb= -fuse-ld=lld) #cmake v3.13
