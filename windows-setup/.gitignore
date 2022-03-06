@@ -1,5 +1,6 @@
+cmake/
 setup/
-dist/
+dist*/
 xournalpp-setup.exe
 xournalpp_launcher
 xournalpp.exe
