@@ -7,6 +7,12 @@ endif()
 
 if (WIN32)
 
+    include(ConfigUtils)
+    write_config_info(
+            DIRECTORY ${PROJECT_SOURCE_DIR}/windows-setup/cmake
+            VARIABLES CMAKE_BINARY_DIR CMAKE_COMMAND CMAKE_BUILD_TYPE CMAKE_CXX_COMPILER
+    )
+
     function(configure_icon_generation icon_ico_var)
         find_package(ImageMagick REQUIRED COMPONENTS convert)
         set(ICON_SVG ${PROJECT_SOURCE_DIR}/ui/pixmaps/com.github.xournalpp.xournalpp.svg)
