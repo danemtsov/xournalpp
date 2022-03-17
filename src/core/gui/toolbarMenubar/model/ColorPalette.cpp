@@ -171,7 +171,7 @@ auto operator>>(std::istream& str, Header& header) -> std::istream& {
 auto Palette::parseErrorDialog(const std::exception& e) const -> void {
 
     std::stringstream msg_stream{};
-    msg_stream << "There has been a problem parsing the color palette file at " << filepath.c_str() << "\n\n";
+    msg_stream << "There has been a problem parsing the color palette file at " << filepath.u8string() << "\n\n";
     msg_stream << "What happened:\n" << e.what() << std::endl;
     msg_stream << "What to do:\n";
     msg_stream << "Please fix your palette file, or rename it so xournalpp creates a new default palette file "
