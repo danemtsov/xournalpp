@@ -27,19 +27,14 @@ constexpr auto CONFIG_FOLDER_NAME = "xournalpp"sv;
 #endif
 
 #ifdef _WIN32
-#include <windows.h>
+#include "util/Win32Util.h"
 
 auto Util::getLongPath(const fs::path& path) -> fs::path {
-    DWORD wLongPathSz = GetLongPathNameW(path.c_str(), nullptr, 0);
-
-    if (wLongPathSz == 0) {
-        return path;
-    }
-
-    std::wstring wLongPath(wLongPathSz, L'\0');
-    GetLongPathNameW(path.c_str(), wLongPath.data(), static_cast<DWORD>(wLongPath.size()));
-    wLongPath.pop_back();
-    return fs::path(std::move(wLongPath));
+    fs::path ret{path};
+    try {
+        ret = xoj::win32::getLongPathName(path);
+    } catch (xoj::win32::win32_error& e) { g_warning("%s", e.what()); }
+    return ret;
 }
 #else
 auto Util::getLongPath(const fs::path& path) -> fs::path { return path; }
@@ -154,14 +149,14 @@ auto Util::toGFile(fs::path const& path) -> GFile* { return g_file_new_for_path(
 
 void Util::openFileWithDefaultApplication(const fs::path& filename) {
 #ifdef __APPLE__
-    constexpr auto const OPEN_PATTERN = "open \"{1}\"";
+        constexpr auto const OPEN_PATTERN = "open \"{1}\"";
 #elif _WIN32  // note the underscore: without it, it's not msdn official!
     constexpr auto const OPEN_PATTERN = "start \"{1}\"";
 #else         // linux, unix, ...
-    constexpr auto const OPEN_PATTERN = "xdg-open \"{1}\"";
+        constexpr auto const OPEN_PATTERN = "xdg-open \"{1}\"";
 #endif
 
-    std::string command = FS(FORMAT_STR(OPEN_PATTERN) % Util::getEscapedPath(filename));
+        std::string command = FS(FORMAT_STR(OPEN_PATTERN) % Util::getEscapedPath(filename));
     if (system(command.c_str()) != 0) {
         std::string msg = FS(_F("File couldn't be opened. You have to do it manually:\n"
                                 "URL: {1}") %
@@ -172,13 +167,13 @@ void Util::openFileWithDefaultApplication(const fs::path& filename) {
 
 void Util::openFileWithFilebrowser(const fs::path& filename) {
 #ifdef __APPLE__
-    constexpr auto const OPEN_PATTERN = "open \"{1}\"";
+        constexpr auto const OPEN_PATTERN = "open \"{1}\"";
 #elif _WIN32
     constexpr auto const OPEN_PATTERN = "explorer.exe /n,/e,\"{1}\"";
 #else  // linux, unix, ...
     constexpr auto const OPEN_PATTERN = R"(nautilus "file://{1}" || dolphin "file://{1}" || konqueror "file://{1}" &)";
 #endif
-    std::string command = FS(FORMAT_STR(OPEN_PATTERN) % Util::getEscapedPath(filename));
+        std::string command = FS(FORMAT_STR(OPEN_PATTERN) % Util::getEscapedPath(filename));
     if (system(command.c_str()) != 0) {
         std::string msg = FS(_F("File couldn't be opened. You have to do it manually:\n"
                                 "URL: {1}") %
@@ -315,12 +310,7 @@ bool Util::safeRenameFile(fs::path const& from, fs::path const& to) {
 
 auto Util::getDataPath() -> fs::path {
 #ifdef _WIN32
-    TCHAR szFileName[MAX_PATH];
-    GetModuleFileName(nullptr, szFileName, MAX_PATH);
-    auto exePath = std::string(szFileName);
-    std::string::size_type pos = exePath.find_last_of("\\/");
-    fs::path p = exePath.substr(0, pos);
-    p = p / ".." / "share" / PROJECT_NAME;
+    fs::path p = Stacktrace::getExePath().remove_filename().append("..\\share").append(PROJECT_NAME);
     return p;
 #elif defined(__APPLE__)
     fs::path p = Stacktrace::getExePath().parent_path();

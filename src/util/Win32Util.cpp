@@ -300,6 +300,16 @@ auto getModuleFileName(HMODULE hModule) -> fs::path {
     return fs::path(std::move(moduleFileName));
 }
 
+auto getLongPathName(const fs::path& path) -> fs::path {
+    const unsigned long length = GetLongPathNameW(path.native().c_str(), nullptr, 0);
+    if (!length) {
+        throw win32_error("GetLongPathName failed");
+    }
+    std::wstring pathStr(length, '\0');
+    GetLongPathNameW(path.native().c_str(), pathStr.data(), length);
+    return fs::path(std::move(pathStr));
+}
+
 namespace detail {
 
 static constexpr unsigned char waitResultFlagTimeout = 0b0001;

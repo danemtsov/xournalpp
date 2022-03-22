@@ -232,6 +232,16 @@ using UniqueLocal = UniqueResource<T, &LocalFree, DeleterFunctionType::zeroIsSuc
 [[maybe_unused]] [[nodiscard]] auto getModuleFileName(HMODULE hModule) -> fs::path;
 
 /**
+ * @brief Converts the specified path to its long form.
+ *
+ * Note: Requires the following permissions on the specified path and parent directories:
+ * * List Folder
+ * * Read Data
+ * * Read Attributes
+ */
+[[maybe_unused]] [[nodiscard]] auto getLongPathName(const fs::path& path) -> fs::path;
+
+/**
  * @brief Strong type for infinite timeout
  */
 struct infinite_t {};
@@ -336,7 +346,8 @@ template <class T>
     assert(count > 0);
     return detail::waitForObjects(strict_cast<unsigned long>(count), data(objects), all, timeout);
 }
-[[maybe_unused]] [[nodiscard]] inline auto waitForMultipleObjects(std::initializer_list<HANDLE>&& objects, bool all, WaitTimeout timeout) {
+[[maybe_unused]] [[nodiscard]] inline auto waitForMultipleObjects(std::initializer_list<HANDLE>&& objects, bool all,
+                                                                  WaitTimeout timeout) {
     return waitForMultipleObjects(objects, all, timeout);
 }
 
