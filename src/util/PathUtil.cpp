@@ -1,8 +1,10 @@
 #include "util/PathUtil.h"
 
-#include <cstdlib>      // for system
-#include <fstream>      // for ifstream, char_traits, basic_ist...
-#include <iterator>     // for begin
+#include <array>
+#include <cstdlib>   // for system
+#include <fstream>   // for ifstream, char_traits, basic_ist...
+#include <iterator>  // for begin
+#include <sstream>
 #include <string_view>  // for basic_string_view, operator""sv
 #include <type_traits>  // for remove_reference<>::type
 #include <utility>      // for move
@@ -11,10 +13,11 @@
 #include <glib.h>          // for gchar, g_free, g_filename_to_uri
 
 #include "util/PlaceholderString.h"  // for PlaceholderString
-#include "util/StringUtils.h"        // for replace_pair, StringUtils
-#include "util/Util.h"               // for getPid, execInUiThread
-#include "util/XojMsgBox.h"          // for XojMsgBox
-#include "util/i18n.h"               // for FS, _F, FORMAT_STR
+#include "util/Stacktrace.h"
+#include "util/StringUtils.h"  // for replace_pair, StringUtils
+#include "util/Util.h"         // for getPid, execInUiThread
+#include "util/XojMsgBox.h"    // for XojMsgBox
+#include "util/i18n.h"         // for FS, _F, FORMAT_STR
 
 #include "config.h"  // for PROJECT_NAME
 
@@ -148,16 +151,24 @@ auto Util::toGFile(fs::path const& path) -> GFile* { return g_file_new_for_path(
 
 
 void Util::openFileWithDefaultApplication(const fs::path& filename) {
+    auto open = [](const fs::path& filename) {
+#ifdef _WIN32
+        std::wostringstream s;
+        s << L"start \"" << filename.native() << "\" \""  // If first arg is quoted, it is interpreted as the title of
+          << filename.native() << '"';                    // a potentially created console window
+        return _wsystem(s.str().c_str());
+#else  // _WIN32
 #ifdef __APPLE__
         constexpr auto const OPEN_PATTERN = "open \"{1}\"";
-#elif _WIN32  // note the underscore: without it, it's not msdn official!
-    constexpr auto const OPEN_PATTERN = "start \"{1}\"";
-#else         // linux, unix, ...
+#else  // linux, unix, ...
         constexpr auto const OPEN_PATTERN = "xdg-open \"{1}\"";
 #endif
-
         std::string command = FS(FORMAT_STR(OPEN_PATTERN) % Util::getEscapedPath(filename));
-    if (system(command.c_str()) != 0) {
+        return system(command.c_str());
+#endif  // _WIN32
+    };
+
+    if (open(filename) != 0) {
         std::string msg = FS(_F("File couldn't be opened. You have to do it manually:\n"
                                 "URL: {1}") %
                              filename.u8string());
@@ -166,15 +177,25 @@ void Util::openFileWithDefaultApplication(const fs::path& filename) {
 }
 
 void Util::openFileWithFilebrowser(const fs::path& filename) {
+    auto open = [](const fs::path& filename) {
+#ifdef _WIN32
+        std::wostringstream s;
+        s << L"explorer.exe /n,/e,\"" << filename.native() << '"';
+        _wsystem(s.str().c_str());  // explorer always returns 1...
+        return 0;
+#else  // _WIN32
 #ifdef __APPLE__
         constexpr auto const OPEN_PATTERN = "open \"{1}\"";
-#elif _WIN32
-    constexpr auto const OPEN_PATTERN = "explorer.exe /n,/e,\"{1}\"";
 #else  // linux, unix, ...
-    constexpr auto const OPEN_PATTERN = R"(nautilus "file://{1}" || dolphin "file://{1}" || konqueror "file://{1}" &)";
+        constexpr auto const OPEN_PATTERN =
+                R"(nautilus "file://{1}" || dolphin "file://{1}" || konqueror "file://{1}" &)";
 #endif
         std::string command = FS(FORMAT_STR(OPEN_PATTERN) % Util::getEscapedPath(filename));
-    if (system(command.c_str()) != 0) {
+        return system(command.c_str());
+#endif  // _WIN32
+    };
+
+    if (open(filename) != 0) {
         std::string msg = FS(_F("File couldn't be opened. You have to do it manually:\n"
                                 "URL: {1}") %
                              filename.u8string());
