@@ -53,6 +53,7 @@ SidebarPreviewBaseEntry::~SidebarPreviewBaseEntry() {
     this->page = nullptr;
 
     gtk_widget_destroy(this->widget);
+    g_object_unref(this->widget);
     this->widget = nullptr;
 
     if (this->crBuffer) {

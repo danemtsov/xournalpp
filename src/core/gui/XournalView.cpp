@@ -100,6 +100,7 @@ XournalView::~XournalView() {
     this->repaintHandler = nullptr;
 
     gtk_widget_destroy(this->widget);
+    g_object_unref(this->widget);
     this->widget = nullptr;
 
     delete this->handRecognition;

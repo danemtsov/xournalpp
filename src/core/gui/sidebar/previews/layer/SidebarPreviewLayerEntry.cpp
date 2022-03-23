@@ -17,6 +17,7 @@ SidebarPreviewLayerEntry::SidebarPreviewLayerEntry(SidebarPreviewLayers* sidebar
         layerId(layerId),
         box(gtk_box_new(GTK_ORIENTATION_VERTICAL, 2)),
         stacked(stacked) {
+    g_object_ref(this->box);
 
     const auto clickCallback = G_CALLBACK(+[](GtkWidget* widget, GdkEvent* event, SidebarPreviewLayerEntry* self) {
         // Open context menu on right mouse click
@@ -60,6 +61,7 @@ SidebarPreviewLayerEntry::SidebarPreviewLayerEntry(SidebarPreviewLayers* sidebar
 
 SidebarPreviewLayerEntry::~SidebarPreviewLayerEntry() {
     gtk_widget_destroy(this->box);
+    g_object_unref(this->box);
     this->box = nullptr;
 }
 

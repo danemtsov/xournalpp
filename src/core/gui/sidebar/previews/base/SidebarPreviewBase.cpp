@@ -52,6 +52,7 @@ SidebarPreviewBase::SidebarPreviewBase(Control* control, GladeGui* gui, SidebarT
 
 SidebarPreviewBase::~SidebarPreviewBase() {
     gtk_widget_destroy(this->iconViewPreview);
+    g_object_unref(this->iconViewPreview);
     this->iconViewPreview = nullptr;
 
     delete this->layoutmanager;

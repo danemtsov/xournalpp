@@ -10,6 +10,7 @@
 
 BaseElementView::BaseElementView(int id, BackgroundSelectDialogBase* dlg): dlg(dlg), id(id) {
     this->widget = gtk_drawing_area_new();
+    g_object_ref(this->widget);
     gtk_widget_show(this->widget);
 
     gtk_widget_set_events(widget, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK);
@@ -19,6 +20,7 @@ BaseElementView::BaseElementView(int id, BackgroundSelectDialogBase* dlg): dlg(d
 
 BaseElementView::~BaseElementView() {
     gtk_widget_destroy(this->widget);
+    g_object_unref(this->widget);
 
     if (this->crBuffer) {
         cairo_surface_destroy(this->crBuffer);
