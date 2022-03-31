@@ -328,7 +328,7 @@ void InputContext::printDebug(GdkEvent* event) {
 
 #ifndef DEBUG_INPUT_PRINT_ALL_MOTION_EVENTS
     static bool motionEventBlock = false;
-    if (gdk_event_get_event_type(event) == GDK_MOTION_NOTIFY) {
+    if (auto type = gdk_event_get_event_type(event); type == GDK_MOTION_NOTIFY || type == GDK_TOUCH_UPDATE) {
         if (!motionEventBlock) {
             motionEventBlock = true;
             g_message("%s", message.c_str());
