@@ -30,7 +30,7 @@
 
 //  All the cursors we want to use. WARNING Make sure to set their css names in cssCursors[] below WARNING
 enum AVAILABLECURSORS {
-    CRSR_nullptr = 0,  // <--- Do Not Modify
+    CRSR_NULL = 0,  // <--- Do Not Modify
     CRSR_BUSY,
     CRSR_MOVE,
     CRSR_MOVING,
@@ -76,7 +76,7 @@ cursorStruct cssCursors[CRSR_END_OF_CURSORS];
 XournalppCursor::XournalppCursor(Control* control): control(control) {
     // clang-format off
 	// NOTE: Go ahead and use a fancy css cursor... but specify a common backup cursor. 
-	cssCursors[CRSR_nullptr                ] = 	{"",""};
+	cssCursors[CRSR_NULL                ] = 	{"",""};
 	cssCursors[CRSR_BUSY                ] = 	{"wait", 		""					};
 	cssCursors[CRSR_MOVE                ] = 	{"all-scroll", 	""					};
 	cssCursors[CRSR_MOVING              ] = 	{"grabbing", 	""					};
@@ -538,19 +538,19 @@ void XournalppCursor::setCursor(int cursorID) {
     GdkCursor* cursor = gdk_cursor_new_from_name(gdk_window_get_display(window), cssCursors[cursorID].cssName);
     if (cursor == nullptr)  // failed to get a cursor, try backup cursor.
     {
-        if (cursorID != CRSR_nullptr) {
+        if (cursorID != CRSR_NULL) {
             cursor = gdk_cursor_new_from_name(gdk_window_get_display(window), cssCursors[cursorID].cssBackupName);
 
             // Null cursor is ok but not wanted ... warn user
             if (cursor == nullptr) {
-                if (CRSR_nullptr == this->currentCursor) {
+                if (CRSR_NULL == this->currentCursor) {
                     return;  // We've already been here
                 }
                 g_warning("CSS Cursor and backup not valid '%s', '%s'", cssCursors[cursorID].cssName,
                           cssCursors[cursorID].cssBackupName);
             }
         }
-        cursorID = cursor == nullptr ? CRSR_nullptr : cursorID;
+        cursorID = cursor == nullptr ? CRSR_NULL : cursorID;
     }
 
     this->currentCursor = cursorID;
