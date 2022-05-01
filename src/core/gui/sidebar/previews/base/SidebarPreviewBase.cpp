@@ -33,6 +33,8 @@ SidebarPreviewBase::SidebarPreviewBase(Control* control, GladeGui* gui, SidebarT
 
     this->scrollPreview = gtk_scrolled_window_new(nullptr, nullptr);
     g_object_ref(this->scrollPreview);
+    GtkStyleContext* context = gtk_widget_get_style_context(this->scrollPreview);
+    gtk_style_context_add_class(context, GTK_STYLE_CLASS_VIEW);
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(this->scrollPreview), GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);

@@ -2250,6 +2250,7 @@
                             <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkBox" id="bxSidebarTopActions">
+                                <property name="name">bxSidebarTopActions</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <child>
@@ -2267,6 +2268,7 @@
                                 <child>
                                   <object class="GtkButton" id="buttonCloseSidebar">
                                     <property name="name">buttonCloseSidebar</property>
+                                    <property name="valign">center</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
@@ -2290,8 +2292,7 @@
                                   </packing>
                                 </child>
                                 <style>
-                                  <class name="linked"/>
-                                  <class name="inline-toolbar"/>
+                                  <class name="toolContainer"/>
                                 </style>
                               </object>
                               <packing>
@@ -2317,25 +2318,29 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkBox" id="box2">
+                              <object class="GtkBox" id="bxSidebarPreviewActions">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
+                                <property name="name">bxSidebarPreviewActions</property>
+                                <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkButton" id="btUp">
                                     <property name="name">btUp</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="hexpand">True</property>
                                     <property name="receives-default">True</property>
                                     <child>
                                       <object class="GtkImage" id="image1">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <property name="icon-name">go-up</property>
+                                        <property name="icon-size">3</property>
                                       </object>
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
+                                    <property name="expand">True</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
                                   </packing>
@@ -2345,17 +2350,19 @@
                                     <property name="name">btDown</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="hexpand">True</property>
                                     <property name="receives-default">True</property>
                                     <child>
                                       <object class="GtkImage" id="image5">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <property name="icon-name">go-down</property>
+                                        <property name="icon-size">3</property>
                                       </object>
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
+                                    <property name="expand">True</property>
                                     <property name="fill">True</property>
                                     <property name="position">2</property>
                                   </packing>
@@ -2365,17 +2372,19 @@
                                     <property name="name">btCopy</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="hexpand">True</property>
                                     <property name="receives-default">True</property>
                                     <child>
                                       <object class="GtkImage" id="image6">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <property name="icon-name">edit-copy</property>
+                                        <property name="icon-size">3</property>
                                       </object>
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
+                                    <property name="expand">True</property>
                                     <property name="fill">True</property>
                                     <property name="position">3</property>
                                   </packing>
@@ -2385,17 +2394,19 @@
                                     <property name="name">btDelete</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="hexpand">True</property>
                                     <property name="receives-default">True</property>
                                     <child>
                                       <object class="GtkImage" id="image7">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <property name="icon-name">edit-delete</property>
+                                        <property name="icon-size">3</property>
                                       </object>
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
+                                    <property name="expand">True</property>
                                     <property name="fill">True</property>
                                     <property name="position">4</property>
                                   </packing>
@@ -2403,15 +2414,18 @@
                                 <style>
                                   <class name="linked"/>
                                   <class name="raised"/>
+                                  <class name="toolContainer"/>
                                 </style>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="padding">2</property>
                                 <property name="position">3</property>
                               </packing>
                             </child>
+                            <style>
+                              <class name="frame"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="resize">False</property>
@@ -2858,6 +2872,9 @@
             <property name="width">2</property>
           </packing>
         </child>
+        <style>
+          <class name="toolContainer"/>
+        </style>
       </object>
     </child>
   </object>
