@@ -9,24 +9,34 @@
  * @license GNU GPLv2
  */
 
+#include <string_view>
+#include "control/Console.h"
 #include "control/CrashHandler.h"  // for installCrashHandlers
 #include "control/XournalMain.h"   // for run
+#include "util/logger/Logger.h"
 
 #ifdef __APPLE__
 #include "osx/setup-env.h"
 #endif
 
-#ifdef _WIN32
-#include <cstdlib>
-
-#include "win32/console.h"
-#endif
-
 auto main(int argc, char* argv[]) -> int {
-#ifdef _WIN32
+    bool showConsole = false;
+    if (argc >= 2) {
+        using namespace std::string_view_literals;
+
+        for (char **argPtr = argv + 1, **end = argv + argc; argPtr != end; argPtr++) {
+            if (*argPtr == "--"sv) {
+                break;
+            }
+            if (*argPtr == "--show-console"sv) {
+                showConsole = true;
+                continue;
+            }
+        }
+    }
+
     // Attach to the console here. Otherwise, gspawn-win32-helper will create annoying console popups.
-    attachConsole();
-#endif
+    ConsoleCtl::initPlatformConsole(showConsole);
 
     // init crash handler
     installCrashHandlers();
