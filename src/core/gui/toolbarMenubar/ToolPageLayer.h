@@ -25,7 +25,6 @@
 #include "AbstractToolItem.h"  // for AbstractToolItem
 
 class GladeGui;
-class PopupMenuButton;
 class LayerController;
 class ActionHandler;
 
@@ -85,7 +84,6 @@ private:
     std::vector<GtkWidget*> layerItems;
     std::vector<GtkWidget*> showLayerItems;
 
-    PopupMenuButton* popupMenuButton = nullptr;
     unsigned int menuY = 0;
 
     /**

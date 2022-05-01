@@ -12,7 +12,6 @@
 
 #include "control/layer/LayerController.h"        // for LayerController
 #include "gui/toolbarMenubar/AbstractToolItem.h"  // for AbstractToolItem
-#include "gui/widgets/PopupMenuButton.h"          // for PopupMenuButton
 #include "model/PageRef.h"                        // for PageRef
 #include "model/XojPage.h"                        // for XojPage
 #include "util/i18n.h"                            // for _
@@ -27,21 +26,21 @@ ToolPageLayer::ToolPageLayer(LayerController* lc, ActionHandler* handler, std::s
         menu(gtk_menu_new()),
         iconNameHelper(iconNameHelper) {
     this->layerLabel = gtk_label_new(_("Loading..."));
-    this->layerButton = gtk_button_new_with_label("⌄");
+
+    this->layerButton = gtk_menu_button_new();
+    GtkStyleContext* context = gtk_widget_get_style_context(this->layerButton);
+    gtk_style_context_add_class(context, GTK_STYLE_CLASS_FLAT);
 
     xoj::util::PangoAttrListSPtr attrs(pango_attr_list_new(), xoj::util::adopt);
     pango_attr_list_insert(attrs.get(), pango_attr_weight_new(PANGO_WEIGHT_BOLD));
     gtk_label_set_attributes(GTK_LABEL(this->layerLabel), attrs.get());
 
-    popupMenuButton = new PopupMenuButton(this->layerButton, menu);
+    gtk_menu_button_set_popup(GTK_MENU_BUTTON(this->layerButton), menu);
 
     LayerCtrlListener::registerListener(lc);
 }
 
-ToolPageLayer::~ToolPageLayer() {
-    delete popupMenuButton;
-    popupMenuButton = nullptr;
-}
+ToolPageLayer::~ToolPageLayer() {}
 
 void ToolPageLayer::rebuildLayerMenu() { updateMenu(); }
 
@@ -172,7 +171,7 @@ void ToolPageLayer::updateMenu() {
 
     // Create a new menu on refresh
     menu = gtk_menu_new();
-    popupMenuButton->setMenu(menu);
+    gtk_menu_button_set_popup(GTK_MENU_BUTTON(this->layerButton), menu);
     layerItems.clear();
     showLayerItems.clear();
 
@@ -251,7 +250,7 @@ auto ToolPageLayer::newItem() -> GtkToolItem* {
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Layer")), false, false, 7);
 
     gtk_box_pack_start(GTK_BOX(hbox), this->layerLabel, false, false, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), this->layerButton, false, false, 0);
+    gtk_box_pack_end(GTK_BOX(hbox), this->layerButton, false, false, 7);
 
     gtk_container_add(GTK_CONTAINER(it), hbox);
 
