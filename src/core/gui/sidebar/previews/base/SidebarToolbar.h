@@ -72,6 +72,8 @@ private:
      */
     SidebarToolbarActionListener* listener;
 
+    GtkWidget* toolbarWidget;
+
     /**
      * Button move Page up
      */

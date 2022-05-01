@@ -5,6 +5,7 @@
 #include "gui/GladeGui.h"  // for GladeGui
 
 SidebarToolbar::SidebarToolbar(SidebarToolbarActionListener* listener, GladeGui* gui): listener(listener) {
+    this->toolbarWidget = GTK_WIDGET(gui->get("bxSidebarPreviewActions"));
     this->btUp = GTK_BUTTON(gui->get("btUp"));
     this->btDown = GTK_BUTTON(gui->get("btDown"));
     this->btCopy = GTK_BUTTON(gui->get("btCopy"));
@@ -37,10 +38,7 @@ void SidebarToolbar::btDeleteClicked(GtkToolButton* toolbutton, SidebarToolbar* 
 }
 
 void SidebarToolbar::setHidden(bool hidden) {
-    gtk_widget_set_visible(GTK_WIDGET(this->btUp), !hidden);
-    gtk_widget_set_visible(GTK_WIDGET(this->btDown), !hidden);
-    gtk_widget_set_visible(GTK_WIDGET(this->btCopy), !hidden);
-    gtk_widget_set_visible(GTK_WIDGET(this->btDelete), !hidden);
+    gtk_widget_set_visible(this->toolbarWidget, !hidden);
 }
 
 void SidebarToolbar::setButtonEnabled(SidebarActions enabledActions) {
