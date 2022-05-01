@@ -147,7 +147,7 @@ void checkForErrorlog() {
 
     std::vector<fs::path> errorList;
     for (auto const& f: fs::directory_iterator(errorDir)) {
-        if (f.is_regular_file() && f.path().stem() == "errorlog") {
+        if (f.is_regular_file() && f.path().filename().native().front() != '-' && f.path().extension() == ".log") {
             errorList.emplace_back(f);
         }
     }
@@ -156,7 +156,7 @@ void checkForErrorlog() {
         return;
     }
 
-    std::sort(errorList.begin(), errorList.end());
+    std::sort(errorList.rbegin(), errorList.rend());
     std::string msg =
             errorList.size() == 1 ?
                     _("There is an errorlogfile from Xournal++. Please send a Bugreport, so the bug may be fixed.") :
@@ -173,7 +173,7 @@ void checkForErrorlog() {
     gtk_dialog_add_button(GTK_DIALOG(dialog), _("Send Bugreport"), 1);
     gtk_dialog_add_button(GTK_DIALOG(dialog), _("Open Logfile"), 2);
     gtk_dialog_add_button(GTK_DIALOG(dialog), _("Open Logfile directory"), 3);
-    gtk_dialog_add_button(GTK_DIALOG(dialog), _("Delete Logfile"), 4);
+    gtk_dialog_add_button(GTK_DIALOG(dialog), _("Ignore Logfile"), 4);
     gtk_dialog_add_button(GTK_DIALOG(dialog), _("Cancel"), 5);
 
     int res = gtk_dialog_run(GTK_DIALOG(dialog));
@@ -190,13 +190,15 @@ void checkForErrorlog() {
     } else if (res == 3)  // Open Logfile directory
     {
         Util::openFileWithFilebrowser(errorlogPath.parent_path());
-    } else if (res == 4)  // Delete Logfile
+    } else if (res == 4)  // Ignore Logfile
     {
         if (!fs::exists(errorlogPath)) {
-            msg = FS(_F("Errorlog cannot be deleted. You have to do it manually.\nLogfile: {1}") %
+            msg = FS(_F("Errorlog cannot be renamed. You have to do it manually.\nLogfile: {1}") %
                      errorlogPath.u8string());
             XojMsgBox::showErrorToUser(nullptr, msg);
         }
+        fs::rename(errorlogPath,
+                   fs::path{errorlogPath}.remove_filename() /= fs::u8path('-' + errorlogPath.filename().u8string()));
     } else if (res == 5)  // Cancel
     {
         // Nothing to do
