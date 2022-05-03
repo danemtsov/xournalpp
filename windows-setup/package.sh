@@ -112,6 +112,7 @@ if ! ( rm -rf "$pkg_setup_dir" && rm -rf xournalpp-setup.exe ); then
 fi
 
 mkdir "$pkg_setup_dir"
+mkdir "$pkg_setup_dir/etc"
 mkdir "$pkg_setup_dir/lib"
 
 echo "copy installed files"
@@ -160,6 +161,9 @@ cp -r "$msys_env_root/share/poppler" "$pkg_setup_dir/share/"
 
 echo "copy gtksourceview shared"
 cp -r "$msys_env_root/share/gtksourceview-4" "$setup_dir/share"
+
+echo "copy font configs"
+cp -r "$msys_env_root/etc/fonts" "$pkg_setup_dir/etc/fonts"
 
 echo "copy gspawn-win64-helper"
 cp "$msys_env_root/bin/gspawn-win64-helper.exe" "$pkg_setup_dir/bin"
