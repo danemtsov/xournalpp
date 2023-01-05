@@ -13,6 +13,7 @@
 #include "control/Control.h"                          // for Control
 #include "control/settings/Settings.h"                // for Settings
 #include "gui/GladeGui.h"                             // for GladeGui
+#include "gui/MainWindow.h"                           // for MainWindow
 #include "gui/sidebar/AbstractSidebarPage.h"          // for AbstractSidebar...
 #include "gui/sidebar/indextree/SidebarIndexPage.h"   // for SidebarIndexPage
 #include "model/Document.h"                           // for Document
@@ -197,12 +198,7 @@ void Sidebar::setTmpDisabled(bool disabled) {
     gdk_display_sync(gdk_display_get_default());
 }
 
-void Sidebar::saveSize() {
-    GtkAllocation alloc;
-    gtk_widget_get_allocation(this->sidebarContents, &alloc);
-
-    this->control->getSettings()->setSidebarWidth(alloc.width);
-}
+void Sidebar::saveSize() { this->control->getWindow()->saveSidebarSize(); }
 
 auto Sidebar::getToolbar() -> SidebarToolbar* { return &this->toolbar; }
 
