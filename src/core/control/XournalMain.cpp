@@ -528,7 +528,14 @@ auto on_handle_local_options(GApplication*, GVariantDict*, XMPtr app_data) -> gi
 
     auto print_version = [&] {
         if constexpr (xoj::util::git::HAVE_GIT) {
-            std::cout << PROJECT_NAME << " " << PROJECT_VERSION << " (" << GIT_COMMIT_ID << ")" << std::endl;
+            std::cout << PROJECT_NAME << " " << PROJECT_VERSION << " (" << GIT_COMMIT_ID;
+
+            if constexpr (xoj::util::git::IS_NON_STANDARD_BRANCH) {
+                std::cout << " on branch '" << GIT_BRANCH << "'";
+            }
+
+            std::cout << ")" << std::endl;
+
         } else {
             std::cout << PROJECT_NAME << " " << PROJECT_VERSION << std::endl;
         }

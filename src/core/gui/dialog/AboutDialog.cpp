@@ -1,7 +1,8 @@
 #include "AboutDialog.h"
 
-#include <cstdio>  // for sprintf
-#include <memory>  // for allocator
+#include <cstdio>   // for sprintf
+#include <memory>   // for allocator
+#include <sstream>  // for ostringstream
 
 #include <gtk/gtk.h>  // for gtk_box_pack_start, gtk_label_set_markup
 
@@ -17,6 +18,7 @@ AboutDialog::AboutDialog(GladeSearchpath* gladeSearchPath): GladeGui(gladeSearch
         auto widget = gtk_label_new(NULL);
         gtk_label_set_markup(GTK_LABEL(widget), str.insert(0, "<b>").append("</b>").c_str());
         gtk_widget_set_halign(widget, GtkAlign::GTK_ALIGN_START);
+        gtk_widget_set_valign(widget, GtkAlign::GTK_ALIGN_START);
         gtk_widget_show(widget);
         gtk_grid_attach(grid, widget, 0, top, 1, 1);
     };
@@ -24,6 +26,7 @@ AboutDialog::AboutDialog(GladeSearchpath* gladeSearchPath): GladeGui(gladeSearch
     auto insertPropertyValue = [](GtkGrid* grid, std::string const& str, gint top) {
         auto widget = gtk_label_new(str.c_str());
         gtk_widget_set_halign(widget, GtkAlign::GTK_ALIGN_START);
+        gtk_widget_set_valign(widget, GtkAlign::GTK_ALIGN_START);
         gtk_widget_show(widget);
         gtk_grid_attach(grid, widget, 1, top, 1, 1);
     };
@@ -43,9 +46,16 @@ AboutDialog::AboutDialog(GladeSearchpath* gladeSearchPath): GladeGui(gladeSearch
 
     if constexpr (xoj::util::git::HAVE_GIT) {
         insertPropertyKey(infoGrid, _("Git commit"), 3);
-        insertPropertyValue(infoGrid, GIT_COMMIT_ID, 3);
-    }
 
+        std::ostringstream s;
+        s << GIT_COMMIT_ID;
+
+        if constexpr (xoj::util::git::IS_NON_STANDARD_BRANCH) {
+            s << "\n(branch: " << GIT_BRANCH << ")";
+        }
+
+        insertPropertyValue(infoGrid, s.str().c_str(), 3);
+    }
 
     auto w1 = get("vboxRepo");
     auto linkButton1 = gtk_link_button_new("https://github.com/xournalpp/xournalpp");
