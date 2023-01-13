@@ -55,6 +55,14 @@ auto GladeGui::get(const std::string& name) -> GtkWidget* {
     return w;
 }
 
+auto GladeGui::getObject(const std::string& name) -> GObject* {
+    GObject* o = gtk_builder_get_object(builder, name.c_str());
+    if (o == nullptr) {
+        g_warning("GladeGui::get: Could not find glade object: \"%s\"", name.c_str());
+    }
+    return o;
+}
+
 auto GladeGui::getWindow() const -> GtkWidget* { return this->window; }
 
 auto GladeGui::getGladeSearchPath() const -> GladeSearchpath* { return this->gladeSearchPath; }

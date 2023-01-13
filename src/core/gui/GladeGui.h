@@ -29,6 +29,7 @@ public:
     operator GdkWindow*();
 
     GtkWidget* get(const std::string& name);
+    GObject* getObject(const std::string& name);
 
     void setThemePath(std::string themePath);
 

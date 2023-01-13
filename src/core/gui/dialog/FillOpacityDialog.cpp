@@ -10,16 +10,16 @@ class GladeSearchpath;
 
 FillOpacityDialog::FillOpacityDialog(GladeSearchpath* gladeSearchPath, int alpha, bool pen):
         GladeGui(gladeSearchPath, "fillOpacity.glade", "fillOpacityDialog"), pen(pen) {
-    GtkWidget* scaleAlpha = get("scaleAlpha");
+    GtkAdjustment* adjustmentAlpha = GTK_ADJUSTMENT(getObject("adjustmentAlpha"));
 
-    gtk_range_set_value(GTK_RANGE(scaleAlpha), static_cast<int>(alpha / 255.0 * 100));
+    gtk_adjustment_set_value(adjustmentAlpha, static_cast<int>(alpha / 255.0 * 100));
 
     setPreviewImage(alpha);
 
-    g_signal_connect(scaleAlpha, "change-value",
-                     G_CALLBACK(+[](GtkRange* range, GtkScrollType scroll, gdouble value, FillOpacityDialog* self) {
+    g_signal_connect(adjustmentAlpha, "value-changed",
+                     G_CALLBACK(+[](GtkAdjustment* adjustment, FillOpacityDialog* self) {
+                         const auto value = gtk_adjustment_get_value(adjustment);
                          self->setPreviewImage((int)(value / 100 * 255));
-                         gtk_range_set_value(range, value);
                      }),
                      this);
 }
