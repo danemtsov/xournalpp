@@ -41,10 +41,9 @@ AboutDialog::AboutDialog(GladeSearchpath* gladeSearchPath): GladeGui(gladeSearch
     sprintf(gtkVersion, "%u.%u.%u", gtk_get_major_version(), gtk_get_minor_version(), gtk_get_micro_version());
     insertPropertyValue(infoGrid, gtkVersion, 2);
 
-    auto const gitCommitId = std::string{GIT_COMMIT_ID};
-    if (!gitCommitId.empty()) {
+    if constexpr (xoj::util::git::HAVE_GIT) {
         insertPropertyKey(infoGrid, _("Git commit"), 3);
-        insertPropertyValue(infoGrid, gitCommitId.c_str(), 3);
+        insertPropertyValue(infoGrid, GIT_COMMIT_ID, 3);
     }
 
 

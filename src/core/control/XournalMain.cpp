@@ -527,7 +527,7 @@ auto on_handle_local_options(GApplication*, GVariantDict*, XMPtr app_data) -> gi
     initCAndCoutLocales();
 
     auto print_version = [&] {
-        if (!std::string(GIT_COMMIT_ID).empty()) {
+        if constexpr (xoj::util::git::HAVE_GIT) {
             std::cout << PROJECT_NAME << " " << PROJECT_VERSION << " (" << GIT_COMMIT_ID << ")" << std::endl;
         } else {
             std::cout << PROJECT_NAME << " " << PROJECT_VERSION << std::endl;
