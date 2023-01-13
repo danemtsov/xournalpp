@@ -441,8 +441,8 @@ void ToolMenuHandler::initToolItems() {
     addStockItem("GOTO_NEXT", ACTION_GOTO_NEXT, "go-next", _("Next"));
     addStockItem("GOTO_LAST", ACTION_GOTO_LAST, "go-last", _("Go to last page"));
 
-    addStockItem("GOTO_PREVIOUS_LAYER", ACTION_GOTO_PREVIOUS_LAYER, "go-previous", _("Go to previous layer"));
-    addStockItem("GOTO_NEXT_LAYER", ACTION_GOTO_NEXT_LAYER, "go-next", _("Go to next layer"));
+    addStockItem("GOTO_PREVIOUS_LAYER", ACTION_GOTO_PREVIOUS_LAYER, "go-down", _("Go to previous layer"));
+    addStockItem("GOTO_NEXT_LAYER", ACTION_GOTO_NEXT_LAYER, "go-up", _("Go to next layer"));
     addStockItem("GOTO_TOP_LAYER", ACTION_GOTO_TOP_LAYER, "go-top", _("Go to top layer"));
 
     addCustomItem("GOTO_NEXT_ANNOTATED_PAGE", ACTION_GOTO_NEXT_ANNOTATED_PAGE, "page-annotated-next",
