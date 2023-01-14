@@ -115,8 +115,12 @@ mkdir "$pkg_setup_dir"
 mkdir "$pkg_setup_dir/lib"
 
 echo "copy installed files"
-(cd "$pkg_build_dir" && "$cmake_command" "$pkg_source_dir" -DCMAKE_INSTALL_PREFIX= &&
-	DESTDIR="$pkg_setup_dir" "$cmake_command" --build . --target install)
+if ! ( cd "$pkg_build_dir" && "$cmake_command" "$pkg_source_dir" -DCMAKE_INSTALL_PREFIX= &&
+	DESTDIR="$pkg_setup_dir" "$cmake_command" --build . --target install ); then
+
+	echoerr "CMake build failed."
+	exit 1
+fi
 
 echo "copy libraries"
 ldd "$pkg_build_dir/xournalpp.exe" | grep "$msys_env_root.*\\.dll" -o | sort -u | xargs -I{} cp "{}" "$pkg_setup_dir/bin/"
