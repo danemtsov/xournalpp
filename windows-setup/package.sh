@@ -155,7 +155,7 @@ echo "copy poppler shared"
 cp -r "$msys_env_root/share/poppler" "$pkg_setup_dir/share/"
 
 echo "copy gtksourceview shared"
-cp -r /mingw64/share/gtksourceview-4 "$setup_dir"/share
+cp -r "$msys_env_root/share/gtksourceview-4" "$setup_dir/share"
 
 echo "copy gspawn-win64-helper"
 cp "$msys_env_root/bin/gspawn-win64-helper.exe" "$pkg_setup_dir/bin"
