@@ -14,7 +14,7 @@ if (WIN32)
     )
 
     function(configure_icon_generation icon_ico_var)
-        find_package(ImageMagick REQUIRED COMPONENTS convert)
+        find_package(ImageMagick REQUIRED COMPONENTS magick convert)
         set(ICON_SVG ${PROJECT_SOURCE_DIR}/ui/pixmaps/com.github.xournalpp.xournalpp.svg)
         set(ICON_ICO ${CMAKE_CURRENT_BINARY_DIR}/win32/xournalpp.ico)
         set(ICON_SIZES 16 32 48 256)
@@ -30,7 +30,7 @@ if (WIN32)
 
         add_custom_command(
                 OUTPUT ${ICON_ICO}
-                COMMAND convert ${ICON_DEPS} ${ICON_ICO} &&
+                COMMAND ${ImageMagick_magick_EXECUTABLE} convert ${ICON_DEPS} ${ICON_ICO} &&
                     ${CMAKE_COMMAND} -E touch_nocreate ${CMAKE_CURRENT_SOURCE_DIR}/Xournalpp.cpp  # trigger relink if icon changed
                 DEPENDS ${ICON_DEPS})
 
